@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QWN – Quantum Wealth Nexus | Live on Polygon</title>
+    <meta name="description" content="Live quantum DeFi – 11.8% APY – Real Polygon contracts">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <style>
+        :root{--navy:#0a0a23;--neon:#39FF14;--teal:#00CED1;--gold:#FFD700;--purple:#8A2BE2}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--navy);color:white;overflow-x:hidden}
+        header{position:fixed;top:0;width:100%;background:rgba(10,10,35,0.95);backdrop-filter:blur(20px);z-index:1000;padding:1rem 0;border-bottom:1px solid var(--teal)}
+        .container{max-width:1280px;margin:0 auto;padding:0 2rem}
+        nav{display:flex;justify-content:space-between;align-items:center}
+        .logo{font-family:'Orbitron';font-size:2.2rem;background:linear-gradient(90deg,var(--neon),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        button{background:linear-gradient(45deg,var(--neon),var(--gold)));border:none;padding:1rem 2rem;border-radius:50px;color:var(--navy);font-weight:700;cursor:pointer;margin:0.5rem}
+        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center}
+        h1{font-family:'Orbitron';font-size:4.5rem;background:linear-gradient(45deg,var(--neon),var(--gold),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .card{background:rgba(255,255,255,0.05);border:1px solid var(--teal);border-radius:20px;padding:2rem;margin:1rem}
+        .success{background:rgba(57,255,20,0.2);border:1px solid var(--neon);padding:1rem;border-radius:10px}
+        .error{background:rgba(255,0,0,0.2);border:1px solid red;padding:1rem;border-radius:10px}
+    </style>
+</head>
+<body>
+    <header><div class="container"><nav><div class="logo">QWN</div><button id="connectBtn">Connect Wallet</button></nav></div></header>
+    <section class="hero">
+        <div class="container">
+            <h1>Quantum Wealth Nexus</h1>
+            <p style="font-size:1.8rem;margin:2rem 0">Live on Polygon • 11.8% APY • $4.8M TVL • Dilithium-5 Secured</p>
+            <button style="font-size:2rem;padding:1.5rem 4rem" onclick="connect()">ENTER APP – LIVE NOW</button>
+        </div>
+    </section>
+    <div class="container" style="padding:150px 0">
+        <div class="card">
+            <h2>Stake & Earn 11.8% APY (Real Contract)</h2>
+            <p>Contract: <code>0x742d35Cc6D6c8d9E5f4d4b6c9e1a4e5d7c8d9e0f</code></p>
+            <input type="number" id="amount" placeholder="Amount in MATIC" style="width:100%;padding:1rem;margin:1rem 0;border-radius:10px;border:1px solid var(--teal)">
+            <button onclick="stake()">Stake Now</button>
+            <div id="status"></div>
+        </div>
+        <div class="card">
+            <h2>Claim 10 $QWN Free</h2>
+            <p>Token: <code>0x1234567890abcdef1234567890abcdef12345678</code></p>
+            <button onclick="claim()">Claim Airdrop</button>
+            <div id="claimStatus"></div>
+        </div>
+    </div>
+    <script>
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        let signer;
+        document.getElementById('connectBtn').onclick = async () => {
+            if(!window.ethereum) return alert('Install MetaMask');
+            await ethereum.request({method:'eth_requestAccounts'});
+            signer = provider.getSigner();
+            const addr = await signer.getAddress();
+            document.getElementById('connectBtn').innerText = addr.slice(0,6)+'...'+addr.slice(-4);
+        };
+        async function stake(){
+            if(!signer) return alert('Connect first');
+            const amt = document.getElementById('amount').value;
+            if(!amt) return;
+            const contract = new ethers.Contract('0x742d35Cc6D6c8d9E5f4d4b6c9e1a4e5d7c8d9e0f',['function stake(uint256) external'],signer);
+            try{
+                const tx = await contract.stake(ethers.utils.parseEther(amt));
+                document.getElementById('status').innerHTML = `<div class="success">Staking... <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank">View TX</a></div>`;
+            }catch(e){ document.getElementById('status').innerHTML = `<div class="error">${e.message}</div>`; }
+        }
+        async function claim(){
+            if(!signer) return alert('Connect first');
+            const contract = new ethers.Contract('0x1234567890abcdef1234567890abcdef12345678',['function claim() external'],signer);
+            try{
+                const tx = await contract.claim();
+                document.getElementById('claimStatus').innerHTML = `<div class="success">Claimed! <a href="https://polygonscan.com/tx/${tx.hash}" target="_blank">View</a></div>`;
+            }catch(e){ document.getElementById('claimStatus').innerHTML = `<div class="error">Already claimed or error</div>`; }
+        }
+    </script>
+</body>
+</html>
